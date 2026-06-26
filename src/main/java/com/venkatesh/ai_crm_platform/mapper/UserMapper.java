@@ -1,8 +1,8 @@
 
 package com.venkatesh.ai_crm_platform.mapper;
 
-import com.venkatesh.ai_crm_platform.Dto.user.UserRequestDto;
-import com.venkatesh.ai_crm_platform.Dto.user.UserResponseDto;
+import com.venkatesh.ai_crm_platform.dto.user.UserRequestDto;
+import com.venkatesh.ai_crm_platform.dto.user.UserResponseDto;
 import com.venkatesh.ai_crm_platform.models.Entities.User;
 
 public class UserMapper {

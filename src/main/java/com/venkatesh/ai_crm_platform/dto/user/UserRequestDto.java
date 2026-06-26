@@ -1,27 +1,28 @@
-package com.venkatesh.ai_crm_platform.Dto;
+package com.venkatesh.ai_crm_platform.dto.user;
+
 
 
 import com.venkatesh.ai_crm_platform.models.Enum.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class UserRequestDto {
 
-    @NotBlank
+    @NotBlank(message = "Name is required")
     private String name;
 
-    @Email
-    @NotBlank
+    @Email(message = "Invalid Email")
+    @NotBlank(message = "Email is required")
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "Password is required")
     private String password;
 
     private String phoneNumber;
 
-    @NotNull
     private Role role;
+
+    private Boolean active;
 }

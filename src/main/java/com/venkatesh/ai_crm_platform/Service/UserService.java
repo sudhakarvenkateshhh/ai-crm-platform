@@ -1,9 +1,9 @@
 package com.venkatesh.ai_crm_platform.Service;
 
 import com.venkatesh.ai_crm_platform.Repository.UserRepository;
-import com.venkatesh.ai_crm_platform.Dto.auth.RegisterRequestDto;
-import com.venkatesh.ai_crm_platform.Dto.user.UserRequestDto;
-import com.venkatesh.ai_crm_platform.Dto.user.UserResponseDto;
+import com.venkatesh.ai_crm_platform.dto.auth.RegisterRequestDto;
+import com.venkatesh.ai_crm_platform.dto.user.UserRequestDto;
+import com.venkatesh.ai_crm_platform.dto.user.UserResponseDto;
 import com.venkatesh.ai_crm_platform.exception.ResourceNotFoundException;
 import com.venkatesh.ai_crm_platform.mapper.UserMapper;
 import com.venkatesh.ai_crm_platform.models.Entities.User;

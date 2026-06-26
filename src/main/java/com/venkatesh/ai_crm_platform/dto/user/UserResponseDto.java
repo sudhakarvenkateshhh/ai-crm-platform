@@ -1,4 +1,5 @@
-package com.venkatesh.ai_crm_platform.Dto;
+package com.venkatesh.ai_crm_platform.dto.user;
+
 
 
 import com.venkatesh.ai_crm_platform.models.Enum.Role;

@@ -1,11 +1,17 @@
 package com.venkatesh.ai_crm_platform.Service;
 
 import com.venkatesh.ai_crm_platform.Repository.CustomerRepository;
+import com.venkatesh.ai_crm_platform.Repository.UserRepository;
+import com.venkatesh.ai_crm_platform.dto.customer.CustomerRequestDto;
+import com.venkatesh.ai_crm_platform.dto.customer.CustomerResponseDto;
 import com.venkatesh.ai_crm_platform.exception.ResourceNotFoundException;
+import com.venkatesh.ai_crm_platform.mapper.CustomerMapper;
 import com.venkatesh.ai_crm_platform.models.Entities.Customer;
+import com.venkatesh.ai_crm_platform.models.Entities.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -13,36 +19,85 @@ import java.util.List;
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
+    private final UserRepository userRepository;
 
-    public Customer create(Customer customer){
-        return customerRepository.save(customer);
+    // CREATE
+    public CustomerResponseDto create(CustomerRequestDto request) {
+
+        Customer customer = CustomerMapper.toEntity(request);
+
+        customer.setCreatedAt(LocalDateTime.now());
+
+        if (request.getAssignedSalesPersonId() != null) {
+
+            User salesPerson = userRepository.findById(
+                            request.getAssignedSalesPersonId())
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException("Sales Person Not Found"));
+
+            customer.setAssignedSalesPerson(salesPerson);
+        }
+
+        Customer savedCustomer = customerRepository.save(customer);
+
+        return CustomerMapper.toResponse(savedCustomer);
     }
 
-    public List<Customer> getAll(){
-        return customerRepository.findAll();
+    // GET ALL
+    public List<CustomerResponseDto> getAll() {
+
+        return customerRepository.findAll()
+                .stream()
+                .map(CustomerMapper::toResponse)
+                .toList();
     }
 
-    public Customer getById(Long id){
-        return customerRepository.findById(id)
+    // GET BY ID
+    public CustomerResponseDto getById(Long id) {
+
+        Customer customer = customerRepository.findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Customer Not Found"));
+                        new ResourceNotFoundException("Customer Not Found"));
+
+        return CustomerMapper.toResponse(customer);
     }
 
-    public Customer update(Long id, Customer customer){
+    // UPDATE
+    public CustomerResponseDto update(Long id,
+                                      CustomerRequestDto request) {
 
-        Customer existing = getById(id);
+        Customer existing = customerRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Customer Not Found"));
 
-        existing.setName(customer.getName());
-        existing.setEmail(customer.getEmail());
-        existing.setPhone(customer.getPhone());
-        existing.setCompanyName(customer.getCompanyName());
-        existing.setAddress(customer.getAddress());
+        existing.setName(request.getName());
+        existing.setEmail(request.getEmail());
+        existing.setPhone(request.getPhone());
+        existing.setCompanyName(request.getCompanyName());
+        existing.setAddress(request.getAddress());
 
-        return customerRepository.save(existing);
+        if (request.getAssignedSalesPersonId() != null) {
+
+            User salesPerson = userRepository.findById(
+                            request.getAssignedSalesPersonId())
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException("Sales Person Not Found"));
+
+            existing.setAssignedSalesPerson(salesPerson);
+        }
+
+        Customer updatedCustomer = customerRepository.save(existing);
+
+        return CustomerMapper.toResponse(updatedCustomer);
     }
 
-    public void delete(Long id){
+    // DELETE
+    public void delete(Long id) {
+
+        if (!customerRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Customer Not Found");
+        }
+
         customerRepository.deleteById(id);
     }
 }

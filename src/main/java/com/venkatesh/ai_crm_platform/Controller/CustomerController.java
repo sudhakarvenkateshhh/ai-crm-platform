@@ -1,8 +1,9 @@
 package com.venkatesh.ai_crm_platform.Controller;
 
-
 import com.venkatesh.ai_crm_platform.Service.CustomerService;
-import com.venkatesh.ai_crm_platform.models.Entities.Customer;
+import com.venkatesh.ai_crm_platform.dto.customer.CustomerRequestDto;
+import com.venkatesh.ai_crm_platform.dto.customer.CustomerResponseDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,30 +16,45 @@ public class CustomerController {
 
     private final CustomerService customerService;
 
+    // CREATE
     @PostMapping
-    public Customer create(@RequestBody Customer customer){
-        return customerService.create(customer);
+    public CustomerResponseDto create(
+            @Valid @RequestBody CustomerRequestDto request) {
+
+        return customerService.create(request);
     }
 
+    // GET ALL
     @GetMapping
-    public List<Customer> getAll(){
+    public List<CustomerResponseDto> getAll() {
+
         return customerService.getAll();
     }
 
+    // GET BY ID
     @GetMapping("/{id}")
-    public Customer getById(@PathVariable Long id){
+    public CustomerResponseDto getById(
+            @PathVariable Long id) {
+
         return customerService.getById(id);
     }
 
+    // UPDATE
     @PutMapping("/{id}")
-    public Customer update(@PathVariable Long id,
-                           @RequestBody Customer customer){
-        return customerService.update(id, customer);
+    public CustomerResponseDto update(
+            @PathVariable Long id,
+            @Valid @RequestBody CustomerRequestDto request) {
+
+        return customerService.update(id, request);
     }
 
+    // DELETE
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable Long id){
+    public String delete(
+            @PathVariable Long id) {
+
         customerService.delete(id);
+
         return "Customer Deleted Successfully";
     }
 }

@@ -1,8 +1,8 @@
 package com.venkatesh.ai_crm_platform.Controller;
 
-import com.venkatesh.ai_crm_platform.Dto.auth.LoginRequestDto;
-import com.venkatesh.ai_crm_platform.Dto.auth.LoginResponseDto;
-import com.venkatesh.ai_crm_platform.Dto.auth.RegisterRequestDto;
+import com.venkatesh.ai_crm_platform.dto.auth.LoginRequestDto;
+import com.venkatesh.ai_crm_platform.dto.auth.LoginResponseDto;
+import com.venkatesh.ai_crm_platform.dto.auth.RegisterRequestDto;
 import com.venkatesh.ai_crm_platform.models.Entities.User;
 import com.venkatesh.ai_crm_platform.security.JwtService;
 import com.venkatesh.ai_crm_platform.Service.UserService;

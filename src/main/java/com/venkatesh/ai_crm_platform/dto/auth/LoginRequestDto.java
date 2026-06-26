@@ -1,4 +1,4 @@
-package com.venkatesh.ai_crm_platform.Dto.auth;
+package com.venkatesh.ai_crm_platform.dto.auth;
 
 
 

@@ -1,8 +1,8 @@
 package com.venkatesh.ai_crm_platform.Controller;
 
 import com.venkatesh.ai_crm_platform.Service.UserService;
-import com.venkatesh.ai_crm_platform.Dto.user.UserRequestDto;
-import com.venkatesh.ai_crm_platform.Dto.user.UserResponseDto;
+import com.venkatesh.ai_crm_platform.dto.user.UserRequestDto;
+import com.venkatesh.ai_crm_platform.dto.user.UserResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
