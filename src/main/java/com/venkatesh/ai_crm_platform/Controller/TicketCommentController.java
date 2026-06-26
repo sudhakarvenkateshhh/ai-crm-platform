@@ -1,8 +1,9 @@
 package com.venkatesh.ai_crm_platform.Controller;
 
-
 import com.venkatesh.ai_crm_platform.Service.TicketCommentService;
-import com.venkatesh.ai_crm_platform.models.Entities.TicketComment;
+import com.venkatesh.ai_crm_platform.dto.ticketcomment.TicketCommentRequestDto;
+import com.venkatesh.ai_crm_platform.dto.ticketcomment.TicketCommentResponseDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,23 +17,31 @@ public class TicketCommentController {
     private final TicketCommentService ticketCommentService;
 
     @PostMapping
-    public TicketComment create(@RequestBody TicketComment comment){
-        return ticketCommentService.create(comment);
+    public TicketCommentResponseDto create(
+            @Valid @RequestBody TicketCommentRequestDto request){
+
+        return ticketCommentService.create(request);
     }
 
     @GetMapping
-    public List<TicketComment> getAll(){
+    public List<TicketCommentResponseDto> getAll(){
+
         return ticketCommentService.getAll();
     }
 
     @GetMapping("/{id}")
-    public TicketComment getById(@PathVariable Long id){
+    public TicketCommentResponseDto getById(
+            @PathVariable Long id){
+
         return ticketCommentService.getById(id);
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable Long id){
+    public String delete(
+            @PathVariable Long id){
+
         ticketCommentService.delete(id);
+
         return "Comment Deleted Successfully";
     }
 }

@@ -1,8 +1,9 @@
 package com.venkatesh.ai_crm_platform.Controller;
 
-
 import com.venkatesh.ai_crm_platform.Service.TicketService;
-import com.venkatesh.ai_crm_platform.models.Entities.Ticket;
+import com.venkatesh.ai_crm_platform.dto.ticket.TicketRequestDto;
+import com.venkatesh.ai_crm_platform.dto.ticket.TicketResponseDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,29 +17,36 @@ public class TicketController {
     private final TicketService ticketService;
 
     @PostMapping
-    public Ticket create(@RequestBody Ticket ticket){
-        return ticketService.create(ticket);
+    public TicketResponseDto create(@Valid @RequestBody TicketRequestDto request){
+
+        return ticketService.create(request);
     }
 
     @GetMapping
-    public List<Ticket> getAll(){
+    public List<TicketResponseDto> getAll(){
+
         return ticketService.getAll();
     }
 
     @GetMapping("/{id}")
-    public Ticket getById(@PathVariable Long id){
+    public TicketResponseDto getById(@PathVariable Long id){
+
         return ticketService.getById(id);
     }
 
     @PutMapping("/{id}")
-    public Ticket update(@PathVariable Long id,
-                         @RequestBody Ticket ticket){
-        return ticketService.update(id, ticket);
+    public TicketResponseDto update(
+            @PathVariable Long id,
+            @Valid @RequestBody TicketRequestDto request){
+
+        return ticketService.update(id,request);
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id){
+
         ticketService.delete(id);
+
         return "Ticket Deleted Successfully";
     }
 }

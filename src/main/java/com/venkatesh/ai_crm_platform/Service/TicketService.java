@@ -1,11 +1,19 @@
 package com.venkatesh.ai_crm_platform.Service;
 
+import com.venkatesh.ai_crm_platform.Repository.CustomerRepository;
 import com.venkatesh.ai_crm_platform.Repository.TicketRepository;
+import com.venkatesh.ai_crm_platform.Repository.UserRepository;
+import com.venkatesh.ai_crm_platform.dto.ticket.TicketRequestDto;
+import com.venkatesh.ai_crm_platform.dto.ticket.TicketResponseDto;
 import com.venkatesh.ai_crm_platform.exception.ResourceNotFoundException;
+import com.venkatesh.ai_crm_platform.mapper.TicketMapper;
+import com.venkatesh.ai_crm_platform.models.Entities.Customer;
 import com.venkatesh.ai_crm_platform.models.Entities.Ticket;
+import com.venkatesh.ai_crm_platform.models.Entities.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -13,35 +21,73 @@ import java.util.List;
 public class TicketService {
 
     private final TicketRepository ticketRepository;
+    private final CustomerRepository customerRepository;
+    private final UserRepository userRepository;
 
-    public Ticket create(Ticket ticket){
-        return ticketRepository.save(ticket);
+    public TicketResponseDto create(TicketRequestDto request){
+
+        Ticket ticket = TicketMapper.toEntity(request);
+
+        ticket.setCreatedAt(LocalDateTime.now());
+
+        Customer customer = customerRepository.findById(request.getCustomerId())
+                .orElseThrow(() -> new ResourceNotFoundException("Customer Not Found"));
+
+        User user = userRepository.findById(request.getAssignedToId())
+                .orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+
+        ticket.setCustomer(customer);
+        ticket.setAssignedTo(user);
+
+        return TicketMapper.toResponse(ticketRepository.save(ticket));
     }
 
-    public List<Ticket> getAll(){
-        return ticketRepository.findAll();
+    public List<TicketResponseDto> getAll(){
+
+        return ticketRepository.findAll()
+                .stream()
+                .map(TicketMapper::toResponse)
+                .toList();
     }
 
-    public Ticket getById(Long id){
-        return ticketRepository.findById(id)
+    public TicketResponseDto getById(Long id){
+
+        Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Ticket Not Found"));
+                        new ResourceNotFoundException("Ticket Not Found"));
+
+        return TicketMapper.toResponse(ticket);
     }
 
-    public Ticket update(Long id, Ticket ticket){
+    public TicketResponseDto update(Long id, TicketRequestDto request){
 
-        Ticket existing = getById(id);
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Ticket Not Found"));
 
-        existing.setTitle(ticket.getTitle());
-        existing.setDescription(ticket.getDescription());
-        existing.setPriority(ticket.getPriority());
-        existing.setStatus(ticket.getStatus());
+        ticket.setTitle(request.getTitle());
+        ticket.setDescription(request.getDescription());
+        ticket.setStatus(request.getStatus());
+        ticket.setPriority(request.getPriority());
 
-        return ticketRepository.save(existing);
+        Customer customer = customerRepository.findById(request.getCustomerId())
+                .orElseThrow(() -> new ResourceNotFoundException("Customer Not Found"));
+
+        User user = userRepository.findById(request.getAssignedToId())
+                .orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+
+        ticket.setCustomer(customer);
+        ticket.setAssignedTo(user);
+
+        return TicketMapper.toResponse(ticketRepository.save(ticket));
     }
 
     public void delete(Long id){
+
+        if(!ticketRepository.existsById(id)){
+            throw new ResourceNotFoundException("Ticket Not Found");
+        }
+
         ticketRepository.deleteById(id);
     }
 }

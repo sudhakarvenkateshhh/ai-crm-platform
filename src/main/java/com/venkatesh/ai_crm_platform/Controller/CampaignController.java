@@ -1,8 +1,9 @@
 package com.venkatesh.ai_crm_platform.Controller;
 
-
 import com.venkatesh.ai_crm_platform.Service.CampaignService;
-import com.venkatesh.ai_crm_platform.models.Entities.Campaign;
+import com.venkatesh.ai_crm_platform.dto.campaign.CampaignRequestDto;
+import com.venkatesh.ai_crm_platform.dto.campaign.CampaignResponseDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,31 +17,31 @@ public class CampaignController {
     private final CampaignService campaignService;
 
     @PostMapping
-    public Campaign create(
-            @RequestBody Campaign campaign){
+    public CampaignResponseDto create(
+            @Valid @RequestBody CampaignRequestDto request){
 
-        return campaignService.create(campaign);
+        return campaignService.create(request);
     }
 
     @GetMapping
-    public List<Campaign> getAll(){
+    public List<CampaignResponseDto> getAll(){
+
         return campaignService.getAll();
     }
 
     @GetMapping("/{id}")
-    public Campaign getById(
+    public CampaignResponseDto getById(
             @PathVariable Long id){
 
         return campaignService.getById(id);
     }
 
     @PutMapping("/{id}")
-    public Campaign update(
+    public CampaignResponseDto update(
             @PathVariable Long id,
-            @RequestBody Campaign campaign){
+            @Valid @RequestBody CampaignRequestDto request){
 
-        return campaignService.update(id,
-                campaign);
+        return campaignService.update(id, request);
     }
 
     @DeleteMapping("/{id}")
@@ -49,6 +50,6 @@ public class CampaignController {
 
         campaignService.delete(id);
 
-        return "Campaign Deleted";
+        return "Campaign Deleted Successfully";
     }
 }
