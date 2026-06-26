@@ -1,8 +1,9 @@
 package com.venkatesh.ai_crm_platform.Controller;
 
-
 import com.venkatesh.ai_crm_platform.Service.ProductService;
-import com.venkatesh.ai_crm_platform.models.Entities.Product;
+import com.venkatesh.ai_crm_platform.dto.product.ProductRequestDto;
+import com.venkatesh.ai_crm_platform.dto.product.ProductResponseDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,40 +17,39 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
-    public Product create(
-            @RequestBody Product product){
+    public ProductResponseDto create(
+            @Valid @RequestBody ProductRequestDto request) {
 
-        return productService.create(product);
+        return productService.create(request);
     }
 
     @GetMapping
-    public List<Product> getAll(){
+    public List<ProductResponseDto> getAll() {
 
         return productService.getAll();
     }
 
     @GetMapping("/{id}")
-    public Product getById(
-            @PathVariable Long id){
+    public ProductResponseDto getById(
+            @PathVariable Long id) {
 
         return productService.getById(id);
     }
 
     @PutMapping("/{id}")
-    public Product update(
+    public ProductResponseDto update(
             @PathVariable Long id,
-            @RequestBody Product product){
+            @Valid @RequestBody ProductRequestDto request) {
 
-        return productService.update(id,
-                product);
+        return productService.update(id, request);
     }
 
     @DeleteMapping("/{id}")
     public String delete(
-            @PathVariable Long id){
+            @PathVariable Long id) {
 
         productService.delete(id);
 
-        return "Product Deleted";
+        return "Product Deleted Successfully";
     }
 }
