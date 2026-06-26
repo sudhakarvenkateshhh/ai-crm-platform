@@ -1,12 +1,13 @@
 package com.venkatesh.ai_crm_platform.Controller;
 
-
 import com.venkatesh.ai_crm_platform.Service.OrderService;
-import com.venkatesh.ai_crm_platform.models.Entities.Order;
+import com.venkatesh.ai_crm_platform.dto.order.OrderRequestDto;
+import com.venkatesh.ai_crm_platform.dto.order.OrderResponseDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-        import java.util.List;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -16,20 +17,20 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public Order create(
-            @RequestBody Order order){
+    public OrderResponseDto create(
+            @Valid @RequestBody OrderRequestDto request){
 
-        return orderService.create(order);
+        return orderService.create(request);
     }
 
     @GetMapping
-    public List<Order> getAll(){
+    public List<OrderResponseDto> getAll(){
 
         return orderService.getAll();
     }
 
     @GetMapping("/{id}")
-    public Order getById(
+    public OrderResponseDto getById(
             @PathVariable Long id){
 
         return orderService.getById(id);
@@ -41,6 +42,6 @@ public class OrderController {
 
         orderService.delete(id);
 
-        return "Order Deleted";
+        return "Order Deleted Successfully";
     }
 }
