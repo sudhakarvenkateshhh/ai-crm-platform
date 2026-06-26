@@ -1,8 +1,9 @@
 package com.venkatesh.ai_crm_platform.Controller;
 
-
 import com.venkatesh.ai_crm_platform.Service.NotificationService;
-import com.venkatesh.ai_crm_platform.models.Entities.Notifications;
+import com.venkatesh.ai_crm_platform.dto.notification.NotificationRequestDto;
+import com.venkatesh.ai_crm_platform.dto.notification.NotificationResponseDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,29 +14,26 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationController {
 
-    private final NotificationService
-            notificationService;
+    private final NotificationService notificationService;
 
     @PostMapping
-    public Notifications create(
-            @RequestBody Notifications notification){
+    public NotificationResponseDto create(
+            @Valid @RequestBody NotificationRequestDto request){
 
-        return notificationService
-                .create(notification);
+        return notificationService.create(request);
     }
 
     @GetMapping
-    public List<Notifications> getAll(){
+    public List<NotificationResponseDto> getAll(){
 
         return notificationService.getAll();
     }
 
     @GetMapping("/{id}")
-    public Notifications getById(
+    public NotificationResponseDto getById(
             @PathVariable Long id){
 
-        return notificationService
-                .getById(id);
+        return notificationService.getById(id);
     }
 
     @DeleteMapping("/{id}")
@@ -44,6 +42,6 @@ public class NotificationController {
 
         notificationService.delete(id);
 
-        return "Notification Deleted";
+        return "Notification Deleted Successfully";
     }
 }

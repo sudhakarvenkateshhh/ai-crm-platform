@@ -1,12 +1,19 @@
 package com.venkatesh.ai_crm_platform.Service;
 
-
+import com.venkatesh.ai_crm_platform.Repository.CampaignRepository;
+import com.venkatesh.ai_crm_platform.Repository.CustomerRepository;
 import com.venkatesh.ai_crm_platform.Repository.EmailRepository;
+import com.venkatesh.ai_crm_platform.dto.email.EmailRequestDto;
+import com.venkatesh.ai_crm_platform.dto.email.EmailResponseDto;
 import com.venkatesh.ai_crm_platform.exception.ResourceNotFoundException;
+import com.venkatesh.ai_crm_platform.mapper.EmailMapper;
+import com.venkatesh.ai_crm_platform.models.Entities.Campaign;
+import com.venkatesh.ai_crm_platform.models.Entities.Customer;
 import com.venkatesh.ai_crm_platform.models.Entities.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -14,23 +21,50 @@ import java.util.List;
 public class EmailService {
 
     private final EmailRepository emailRepository;
+    private final CustomerRepository customerRepository;
+    private final CampaignRepository campaignRepository;
 
-    public Email create(Email email){
-        return emailRepository.save(email);
+    public EmailResponseDto create(EmailRequestDto request){
+
+        Email email = EmailMapper.toEntity(request);
+
+        email.setSentAt(LocalDateTime.now());
+
+        Customer customer = customerRepository.findById(request.getCustomerId())
+                .orElseThrow(() -> new ResourceNotFoundException("Customer Not Found"));
+
+        Campaign campaign = campaignRepository.findById(request.getCampaignId())
+                .orElseThrow(() -> new ResourceNotFoundException("Campaign Not Found"));
+
+        email.setCustomer(customer);
+        email.setCampaign(campaign);
+
+        return EmailMapper.toResponse(emailRepository.save(email));
     }
 
-    public List<Email> getAll(){
-        return emailRepository.findAll();
+    public List<EmailResponseDto> getAll(){
+
+        return emailRepository.findAll()
+                .stream()
+                .map(EmailMapper::toResponse)
+                .toList();
     }
 
-    public Email getById(Long id){
-        return emailRepository.findById(id)
+    public EmailResponseDto getById(Long id){
+
+        Email email = emailRepository.findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Email Not Found"));
+                        new ResourceNotFoundException("Email Not Found"));
+
+        return EmailMapper.toResponse(email);
     }
 
     public void delete(Long id){
+
+        if(!emailRepository.existsById(id)){
+            throw new ResourceNotFoundException("Email Not Found");
+        }
+
         emailRepository.deleteById(id);
     }
 }

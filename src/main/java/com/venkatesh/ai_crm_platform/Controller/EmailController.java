@@ -1,8 +1,9 @@
 package com.venkatesh.ai_crm_platform.Controller;
 
-
 import com.venkatesh.ai_crm_platform.Service.EmailService;
-import com.venkatesh.ai_crm_platform.models.Entities.Email;
+import com.venkatesh.ai_crm_platform.dto.email.EmailRequestDto;
+import com.venkatesh.ai_crm_platform.dto.email.EmailResponseDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,19 +17,20 @@ public class EmailController {
     private final EmailService emailService;
 
     @PostMapping
-    public Email create(
-            @RequestBody Email email){
+    public EmailResponseDto create(
+            @Valid @RequestBody EmailRequestDto request){
 
-        return emailService.create(email);
+        return emailService.create(request);
     }
 
     @GetMapping
-    public List<Email> getAll(){
+    public List<EmailResponseDto> getAll(){
+
         return emailService.getAll();
     }
 
     @GetMapping("/{id}")
-    public Email getById(
+    public EmailResponseDto getById(
             @PathVariable Long id){
 
         return emailService.getById(id);
@@ -40,6 +42,6 @@ public class EmailController {
 
         emailService.delete(id);
 
-        return "Email Deleted";
+        return "Email Deleted Successfully";
     }
 }
