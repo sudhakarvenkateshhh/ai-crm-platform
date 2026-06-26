@@ -1,8 +1,11 @@
 package com.venkatesh.ai_crm_platform.Service;
 
-import com.venkatesh.ai_crm_platform.Dto.auth.RegisterRequestDto;
 import com.venkatesh.ai_crm_platform.Repository.UserRepository;
+import com.venkatesh.ai_crm_platform.Dto.auth.RegisterRequestDto;
+import com.venkatesh.ai_crm_platform.Dto.user.UserRequestDto;
+import com.venkatesh.ai_crm_platform.Dto.user.UserResponseDto;
 import com.venkatesh.ai_crm_platform.exception.ResourceNotFoundException;
+import com.venkatesh.ai_crm_platform.mapper.UserMapper;
 import com.venkatesh.ai_crm_platform.models.Entities.User;
 import com.venkatesh.ai_crm_platform.models.Enum.Role;
 import lombok.RequiredArgsConstructor;
@@ -16,33 +19,15 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
-
     private final PasswordEncoder passwordEncoder;
 
-    // Create User
-    public User create(User user) {
-
-        user.setPassword(
-                passwordEncoder.encode(user.getPassword())
-        );
-
-        return userRepository.save(user);
-    }
-
-    // Get All Users
-    public List<User> getAll() {
-        return userRepository.findAll();
-    }
-
-    // Get User By Id
-    public User getById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "User Not Found"));
-    }
+    // ================= REGISTER =================
 
     public User register(RegisterRequestDto request) {
+
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already exists");
+        }
 
         User user = new User();
 
@@ -51,38 +36,82 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPhoneNumber(request.getPhoneNumber());
 
-        // Default values
+        // Default role after registration
         user.setRole(Role.SALES);
+
         user.setActive(true);
 
         return userRepository.save(user);
     }
 
-    // Update User
-    public User update(Long id, User user) {
+    // ================= CREATE USER =================
 
-        User existing = getById(id);
+    public UserResponseDto create(UserRequestDto request) {
 
-        existing.setName(user.getName());
-        existing.setEmail(user.getEmail());
-        existing.setPhoneNumber(user.getPhoneNumber());
-        existing.setRole(user.getRole());
-        existing.setActive(user.getActive());
+        User user = UserMapper.toEntity(request);
 
-        // Update password only if provided
-        if (user.getPassword() != null &&
-                !user.getPassword().isBlank()) {
+        // Always encrypt password
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-            existing.setPassword(
-                    passwordEncoder.encode(user.getPassword())
-            );
-        }
+        User savedUser = userRepository.save(user);
 
-        return userRepository.save(existing);
+        return UserMapper.toResponse(savedUser);
     }
 
-    // Delete User
+    // ================= GET ALL USERS =================
+
+    public List<UserResponseDto> getAll() {
+
+        return userRepository.findAll()
+                .stream()
+                .map(UserMapper::toResponse)
+                .toList();
+    }
+
+    // ================= GET USER =================
+
+    public UserResponseDto getById(Long id) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User Not Found"));
+
+        return UserMapper.toResponse(user);
+    }
+
+    // ================= UPDATE USER =================
+
+    public UserResponseDto update(Long id,
+                                  UserRequestDto request) {
+
+        User existing = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User Not Found"));
+
+        existing.setName(request.getName());
+        existing.setEmail(request.getEmail());
+
+        existing.setPassword(
+                passwordEncoder.encode(request.getPassword())
+        );
+
+        existing.setPhoneNumber(request.getPhoneNumber());
+        existing.setRole(request.getRole());
+        existing.setActive(request.getActive());
+
+        User updatedUser = userRepository.save(existing);
+
+        return UserMapper.toResponse(updatedUser);
+    }
+
+    // ================= DELETE USER =================
+
     public void delete(Long id) {
+
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException("User Not Found");
+        }
+
         userRepository.deleteById(id);
     }
 }

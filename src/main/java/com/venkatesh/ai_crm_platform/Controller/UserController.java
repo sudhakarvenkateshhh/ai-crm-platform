@@ -1,7 +1,8 @@
 package com.venkatesh.ai_crm_platform.Controller;
 
 import com.venkatesh.ai_crm_platform.Service.UserService;
-import com.venkatesh.ai_crm_platform.models.Entities.User;
+import com.venkatesh.ai_crm_platform.Dto.user.UserRequestDto;
+import com.venkatesh.ai_crm_platform.Dto.user.UserResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,28 +17,34 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public User create(@Valid @RequestBody User user){
-        return userService.create(user);
+    public UserResponseDto create(@Valid @RequestBody UserRequestDto request) {
+
+        return userService.create(request);
     }
 
     @GetMapping
-    public List<User> getAll(){
+    public List<UserResponseDto> getAll() {
+
         return userService.getAll();
     }
 
     @GetMapping("/{id}")
-    public User getById(@PathVariable Long id){
+    public UserResponseDto getById(@PathVariable Long id) {
+
         return userService.getById(id);
     }
 
     @PutMapping("/{id}")
-    public User update(@PathVariable Long id,
-                       @RequestBody User user){
-        return userService.update(id,user);
+    public UserResponseDto update(
+            @PathVariable Long id,
+            @Valid @RequestBody UserRequestDto request) {
+
+        return userService.update(id, request);
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable Long id){
+    public String delete(@PathVariable Long id) {
+
         userService.delete(id);
         return "Deleted Successfully";
     }
