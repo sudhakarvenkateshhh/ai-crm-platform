@@ -32,6 +32,7 @@ public class ProductMapper {
         dto.setDescription(product.getDescription());
         dto.setPrice(product.getPrice());
         dto.setStock(product.getStock());
+        dto.setImageUrl(product.getImageUrl());
 
         return dto;
     }

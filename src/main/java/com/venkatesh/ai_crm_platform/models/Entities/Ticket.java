@@ -31,6 +31,7 @@ public class Ticket {
     private Priority priority;
 
     private LocalDateTime createdAt;
+    private String attachment;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")

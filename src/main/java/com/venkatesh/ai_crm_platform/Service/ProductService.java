@@ -16,19 +16,24 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import com.venkatesh.ai_crm_platform.Service.storage.FileStorageService;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final FileStorageService fileStorageService;
 
     // CREATE
+    @PreAuthorize("hasAnyRole('ADMIN','SALES')")
     public ProductResponseDto create(ProductRequestDto request) {
 
         Product product = ProductMapper.toEntity(request);
@@ -39,6 +44,7 @@ public class ProductService {
     }
 
     // GET ALL
+    @PreAuthorize("hasAnyRole('ADMIN','SALES','MANAGER')")
     public PageResponse<ProductResponseDto> getAll(
             int page,
             int size,
@@ -80,6 +86,7 @@ public class ProductService {
 
 
     // GET BY ID
+    @PreAuthorize("hasAnyRole('ADMIN','SALES','MANAGER')")
     public ProductResponseDto getById(Long id) {
 
         Product product = productRepository.findById(id)
@@ -90,6 +97,7 @@ public class ProductService {
     }
 
     // UPDATE
+    @PreAuthorize("hasAnyRole('ADMIN','SALES')")
     public ProductResponseDto update(Long id,
                                      ProductRequestDto request) {
 
@@ -106,8 +114,23 @@ public class ProductService {
 
         return ProductMapper.toResponse(updatedProduct);
     }
+    @PreAuthorize("hasAnyRole('ADMIN','SALES')")
+    public ProductResponseDto uploadImage(Long id, MultipartFile file){
 
+        Product product = productRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Product Not Found"));
+
+        String fileName = fileStorageService.uploadFile(file);
+
+        product.setImageUrl(fileName);
+
+        return ProductMapper.toResponse(
+                productRepository.save(product)
+        );
+    }
     // DELETE
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(Long id) {
 
         if (!productRepository.existsById(id)) {

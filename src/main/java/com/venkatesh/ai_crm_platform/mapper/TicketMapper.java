@@ -30,6 +30,7 @@ public class TicketMapper {
         dto.setStatus(ticket.getStatus());
         dto.setPriority(ticket.getPriority());
         dto.setCreatedAt(ticket.getCreatedAt());
+        dto.setAttachment(ticket.getAttachment());
 
         if(ticket.getCustomer()!=null){
             dto.setCustomerId(ticket.getCustomer().getId());

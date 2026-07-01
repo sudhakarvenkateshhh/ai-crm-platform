@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import com.venkatesh.ai_crm_platform.Repository.*;
 import com.venkatesh.ai_crm_platform.models.Enum.TicketStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class DashboardService {
     private final EmailRepository emailRepository;
 
     private final NotificationRepository notificationRepository;
-
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public DashboardResponseDto getDashboard(){
 
         DashboardResponseDto dto = new DashboardResponseDto();
@@ -63,6 +64,7 @@ public class DashboardService {
         );
         return dto;
     }
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public List<MonthlyOrdersDto> getMonthlyOrders() {
 
         List<Object[]> result = orderRepository.getMonthlyOrders();
@@ -80,7 +82,7 @@ public class DashboardService {
 
         return response;
     }
-
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public List<MonthlyRevenueDto> getMonthlyRevenue(){
 
         List<Object[]> result =
@@ -108,6 +110,7 @@ public class DashboardService {
         return response;
 
     }
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public List<TopCustomerDto> getTopCustomers(){
 
         List<Object[]> result =
@@ -137,6 +140,7 @@ public class DashboardService {
         return response;
 
     }
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public List<CustomerGrowthDto> getCustomerGrowth(){
 
         List<Object[]> result =
@@ -164,6 +168,7 @@ public class DashboardService {
         return response;
 
     }
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public List<TicketStatusDto> getTicketStatus(){
 
         List<Object[]> result =
@@ -191,6 +196,7 @@ public class DashboardService {
         return response;
 
     }
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public List<TopProductDto> getTopProducts(){
 
         List<Object[]> result =

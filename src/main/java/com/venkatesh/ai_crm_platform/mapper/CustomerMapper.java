@@ -35,6 +35,7 @@ public class CustomerMapper {
         dto.setPhone(customer.getPhone());
         dto.setCompanyName(customer.getCompanyName());
         dto.setAddress(customer.getAddress());
+        dto.setProfileImage(customer.getProfileImage());
         dto.setCreatedAt(customer.getCreatedAt());
 
         if (customer.getAssignedSalesPerson() != null) {

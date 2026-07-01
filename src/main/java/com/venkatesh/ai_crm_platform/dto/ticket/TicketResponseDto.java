@@ -20,6 +20,7 @@ public class TicketResponseDto {
     private Priority priority;
 
     private LocalDateTime createdAt;
+    private String attachment;
 
     private Long customerId;
 

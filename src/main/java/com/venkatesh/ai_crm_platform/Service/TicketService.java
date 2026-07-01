@@ -20,10 +20,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import com.venkatesh.ai_crm_platform.Service.storage.FileStorageService;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +35,9 @@ public class TicketService {
     private final TicketRepository ticketRepository;
     private final CustomerRepository customerRepository;
     private final UserRepository userRepository;
+    private final FileStorageService fileStorageService;
 
+    @PreAuthorize("hasAnyRole('ADMIN','SUPPORT')")
     public TicketResponseDto create(TicketRequestDto request){
 
         Ticket ticket = TicketMapper.toEntity(request);
@@ -50,7 +55,7 @@ public class TicketService {
 
         return TicketMapper.toResponse(ticketRepository.save(ticket));
     }
-
+    @PreAuthorize("hasAnyRole('ADMIN','SUPPORT')")
     public PageResponse<TicketResponseDto> getAll(
 
             int page,
@@ -120,6 +125,23 @@ public class TicketService {
 
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','SUPPORT')")
+    public TicketResponseDto uploadAttachment(Long id,
+                                              MultipartFile file){
+
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Ticket Not Found"));
+
+        String fileName = fileStorageService.uploadFile(file);
+
+        ticket.setAttachment(fileName);
+
+        return TicketMapper.toResponse(
+                ticketRepository.save(ticket)
+        );
+    }
+    @PreAuthorize("hasAnyRole('ADMIN','SUPPORT')")
     public TicketResponseDto getById(Long id){
 
         Ticket ticket = ticketRepository.findById(id)
@@ -128,7 +150,7 @@ public class TicketService {
 
         return TicketMapper.toResponse(ticket);
     }
-
+    @PreAuthorize("hasAnyRole('ADMIN','SUPPORT')")
     public TicketResponseDto update(Long id, TicketRequestDto request){
 
         Ticket ticket = ticketRepository.findById(id)
@@ -151,7 +173,7 @@ public class TicketService {
 
         return TicketMapper.toResponse(ticketRepository.save(ticket));
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(Long id){
 
         if(!ticketRepository.existsById(id)){

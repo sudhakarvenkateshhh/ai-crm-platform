@@ -9,6 +9,7 @@ import com.venkatesh.ai_crm_platform.mapper.UserMapper;
 import com.venkatesh.ai_crm_platform.models.Entities.User;
 import com.venkatesh.ai_crm_platform.models.Enum.Role;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +52,7 @@ public class UserService {
     }
 
     // ================= CREATE USER =================
-
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponseDto create(UserRequestDto request) {
 
         User user = UserMapper.toEntity(request);
@@ -65,6 +66,7 @@ public class UserService {
     }
 
     // ================= GET ALL USERS =================
+    @PreAuthorize("hasRole('ADMIN')")
     public PageResponse<UserResponseDto> getAll(
 
             int page,
@@ -135,6 +137,7 @@ public class UserService {
     }
     // ================= GET USER =================
 
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponseDto getById(Long id) {
 
         User user = userRepository.findById(id)
@@ -146,6 +149,7 @@ public class UserService {
 
     // ================= UPDATE USER =================
 
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponseDto update(Long id,
                                   UserRequestDto request) {
 
@@ -170,7 +174,7 @@ public class UserService {
     }
 
     // ================= DELETE USER =================
-
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(Long id) {
 
         if (!userRepository.existsById(id)) {

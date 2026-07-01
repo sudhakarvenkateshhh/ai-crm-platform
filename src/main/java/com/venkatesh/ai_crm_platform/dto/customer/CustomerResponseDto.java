@@ -19,6 +19,7 @@ public class CustomerResponseDto {
     private String companyName;
 
     private String address;
+    private String profileImage;
 
     private LocalDateTime createdAt;
 

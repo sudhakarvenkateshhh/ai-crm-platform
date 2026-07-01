@@ -18,6 +18,7 @@ import com.venkatesh.ai_crm_platform.specification.OrderSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -36,6 +37,7 @@ public class OrderService {
 
     // ================= CREATE =================
     @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN','SALES')")
     public OrderResponseDto create(OrderRequestDto request){
 
         Customer customer = customerRepository.findById(request.getCustomerId())
@@ -110,6 +112,7 @@ public class OrderService {
 
     // ================= GET ALL =================
 
+    @PreAuthorize("hasAnyRole('ADMIN','SALES','MANAGER')")
     public PageResponse<OrderResponseDto> getAll(
 
             int page,
@@ -175,7 +178,7 @@ public class OrderService {
     }
 
     // ================= GET BY ID =================
-
+    @PreAuthorize("hasAnyRole('ADMIN','SALES','MANAGER')")
     public OrderResponseDto getById(Long id){
 
         Order order = orderRepository.findById(id)
@@ -188,7 +191,7 @@ public class OrderService {
     }
 
     // ================= DELETE =================
-
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(Long id){
 
         if(!orderRepository.existsById(id)){

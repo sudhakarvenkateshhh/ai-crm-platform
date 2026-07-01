@@ -9,6 +9,7 @@ import com.venkatesh.ai_crm_platform.mapper.CampaignMapper;
 import com.venkatesh.ai_crm_platform.models.Entities.Campaign;
 import com.venkatesh.ai_crm_platform.models.Entities.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class CampaignService {
 
     private final CampaignRepository campaignRepository;
     private final UserRepository userRepository;
-
+    @PreAuthorize("hasAnyRole('ADMIN','MARKETING')")
     public CampaignResponseDto create(CampaignRequestDto request){
 
         Campaign campaign = CampaignMapper.toEntity(request);
@@ -38,7 +39,7 @@ public class CampaignService {
         return CampaignMapper.toResponse(
                 campaignRepository.save(campaign));
     }
-
+    @PreAuthorize("hasAnyRole('ADMIN','MARKETING')")
     public PageResponse<CampaignResponseDto> getAll(
 
             int page,
@@ -99,7 +100,7 @@ public class CampaignService {
         );
 
     }
-
+    @PreAuthorize("hasAnyRole('ADMIN','MARKETING')")
     public CampaignResponseDto getById(Long id){
 
         Campaign campaign = campaignRepository.findById(id)
@@ -108,7 +109,7 @@ public class CampaignService {
 
         return CampaignMapper.toResponse(campaign);
     }
-
+    @PreAuthorize("hasAnyRole('ADMIN','MARKETING')")
     public CampaignResponseDto update(Long id,
                                       CampaignRequestDto request){
 
@@ -130,7 +131,7 @@ public class CampaignService {
         return CampaignMapper.toResponse(
                 campaignRepository.save(campaign));
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(Long id){
 
         if(!campaignRepository.existsById(id)){

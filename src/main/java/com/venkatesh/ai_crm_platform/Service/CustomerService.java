@@ -16,10 +16,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import com.venkatesh.ai_crm_platform.Service.storage.FileStorageService;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +30,10 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
     private final UserRepository userRepository;
+    private final FileStorageService fileStorageService;
 
     // CREATE
+    @PreAuthorize("hasAnyRole('ADMIN','SALES')")
     public CustomerResponseDto create(CustomerRequestDto request) {
 
         Customer customer = CustomerMapper.toEntity(request);
@@ -49,8 +54,24 @@ public class CustomerService {
 
         return CustomerMapper.toResponse(savedCustomer);
     }
+    @PreAuthorize("hasAnyRole('ADMIN','SALES')")
+    public CustomerResponseDto uploadProfile(Long id,
+                                             MultipartFile file){
 
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Customer Not Found"));
+
+        String fileName = fileStorageService.uploadFile(file);
+
+        customer.setProfileImage(fileName);
+
+        return CustomerMapper.toResponse(
+                customerRepository.save(customer)
+        );
+    }
     // GET ALL
+    @PreAuthorize("hasAnyRole('ADMIN','SALES','MANAGER')")
     public PageResponse<CustomerResponseDto> getAll(
             int page,
             int size,
@@ -87,15 +108,11 @@ public class CustomerService {
                 customerPage.getTotalPages(),
                 customerPage.isLast()
         );
-    }  public List<CustomerResponseDto> getAll() {
-
-        return customerRepository.findAll()
-                .stream()
-                .map(CustomerMapper::toResponse)
-                .toList();
     }
 
+
     // GET BY ID
+    @PreAuthorize("hasAnyRole('ADMIN','SALES','MANAGER')")
     public CustomerResponseDto getById(Long id) {
 
         Customer customer = customerRepository.findById(id)
@@ -106,6 +123,7 @@ public class CustomerService {
     }
 
     // UPDATE
+    @PreAuthorize("hasAnyRole('ADMIN','SALES')")
     public CustomerResponseDto update(Long id,
                                       CustomerRequestDto request) {
 
@@ -135,6 +153,7 @@ public class CustomerService {
     }
 
     // DELETE
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(Long id) {
 
         if (!customerRepository.existsById(id)) {

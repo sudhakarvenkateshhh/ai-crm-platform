@@ -30,6 +30,7 @@ public class Customer {
     private String companyName;
 
     private String address;
+    private String profileImage;
 
     private LocalDateTime createdAt;
 
