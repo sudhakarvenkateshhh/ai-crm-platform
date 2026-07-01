@@ -1,10 +1,9 @@
 package com.venkatesh.ai_crm_platform.Service;
 import com.venkatesh.ai_crm_platform.Repository.OrderItemRepository;
-import com.venkatesh.ai_crm_platform.dto.dashboard.TopProductDto;
+import com.venkatesh.ai_crm_platform.dto.dashboard.*;
+
 import java.util.ArrayList;
 import com.venkatesh.ai_crm_platform.Repository.*;
-import com.venkatesh.ai_crm_platform.dto.dashboard.DashboardResponseDto;
-import com.venkatesh.ai_crm_platform.dto.dashboard.MonthlyOrdersDto;
 import com.venkatesh.ai_crm_platform.models.Enum.TicketStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -80,6 +79,117 @@ public class DashboardService {
         }
 
         return response;
+    }
+
+    public List<MonthlyRevenueDto> getMonthlyRevenue(){
+
+        List<Object[]> result =
+                orderRepository.getMonthlyRevenue();
+
+        List<MonthlyRevenueDto> response =
+                new ArrayList<>();
+
+        for(Object[] row : result){
+
+            response.add(
+
+                    new MonthlyRevenueDto(
+
+                            ((Number)row[0]).intValue(),
+
+                            ((Number)row[1]).doubleValue()
+
+                    )
+
+            );
+
+        }
+
+        return response;
+
+    }
+    public List<TopCustomerDto> getTopCustomers(){
+
+        List<Object[]> result =
+                orderRepository.getTopCustomers();
+
+        List<TopCustomerDto> response =
+                new ArrayList<>();
+
+        for(Object[] row : result){
+
+            response.add(
+
+                    new TopCustomerDto(
+
+                            ((Number)row[0]).longValue(),
+
+                            (String)row[1],
+
+                            ((Number)row[2]).doubleValue()
+
+                    )
+
+            );
+
+        }
+
+        return response;
+
+    }
+    public List<CustomerGrowthDto> getCustomerGrowth(){
+
+        List<Object[]> result =
+                customerRepository.getCustomerGrowth();
+
+        List<CustomerGrowthDto> response =
+                new ArrayList<>();
+
+        for(Object[] row : result){
+
+            response.add(
+
+                    new CustomerGrowthDto(
+
+                            ((Number)row[0]).intValue(),
+
+                            ((Number)row[1]).longValue()
+
+                    )
+
+            );
+
+        }
+
+        return response;
+
+    }
+    public List<TicketStatusDto> getTicketStatus(){
+
+        List<Object[]> result =
+                ticketRepository.getTicketStatus();
+
+        List<TicketStatusDto> response =
+                new ArrayList<>();
+
+        for(Object[] row : result){
+
+            response.add(
+
+                    new TicketStatusDto(
+
+                            (TicketStatus) row[0],
+
+                            ((Number)row[1]).longValue()
+
+                    )
+
+            );
+
+        }
+
+        return response;
+
     }
     public List<TopProductDto> getTopProducts(){
 

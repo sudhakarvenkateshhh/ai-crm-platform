@@ -88,9 +88,7 @@ public class OrderService {
 
             );
 
-            product.setStock(
-                    product.getStock() - itemDto.getQuantity()
-            );
+
 
             totalAmount +=
 

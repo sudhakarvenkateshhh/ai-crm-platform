@@ -29,4 +29,25 @@ ORDER BY MONTH(o.orderDate)
 """)
     List<Object[]> getMonthlyOrders();
 
+    @Query("""
+SELECT
+MONTH(o.orderDate),
+SUM(o.totalAmount)
+FROM Order o
+GROUP BY MONTH(o.orderDate)
+ORDER BY MONTH(o.orderDate)
+""")
+    List<Object[]> getMonthlyRevenue();
+
+    @Query("""
+SELECT
+o.customer.id,
+o.customer.name,
+SUM(o.totalAmount)
+FROM Order o
+GROUP BY o.customer.id,o.customer.name
+ORDER BY SUM(o.totalAmount) DESC
+""")
+    List<Object[]> getTopCustomers();
+
 }
