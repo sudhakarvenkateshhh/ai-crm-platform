@@ -3,6 +3,9 @@ package com.venkatesh.ai_crm_platform.Controller;
 import com.venkatesh.ai_crm_platform.Service.ProductService;
 import com.venkatesh.ai_crm_platform.dto.product.ProductRequestDto;
 import com.venkatesh.ai_crm_platform.dto.product.ProductResponseDto;
+import com.venkatesh.ai_crm_platform.response.ApiResponse;
+import com.venkatesh.ai_crm_platform.response.PageResponse;
+import com.venkatesh.ai_crm_platform.response.ResponseBuilder;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,39 +20,69 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
-    public ProductResponseDto create(
-            @Valid @RequestBody ProductRequestDto request) {
+    public ApiResponse<ProductResponseDto> create(
+            @Valid @RequestBody ProductRequestDto request){
 
-        return productService.create(request);
+        return ResponseBuilder.success(
+                "Product created successfully",
+                productService.create(request));
     }
-
     @GetMapping
-    public List<ProductResponseDto> getAll() {
+    public ApiResponse<PageResponse<ProductResponseDto>> getAll(
 
-        return productService.getAll();
+            @RequestParam(defaultValue = "0") int page,
+
+            @RequestParam(defaultValue = "10") int size,
+
+            @RequestParam(defaultValue = "id") String sortBy,
+
+            @RequestParam(defaultValue = "asc") String direction,
+
+            @RequestParam(required = false) String keyword,
+
+            @RequestParam(required = false) Integer stock
+    ) {
+
+        return ResponseBuilder.success(
+                "Products fetched successfully",
+                productService.getAll(
+                        page,
+                        size,
+                        sortBy,
+                        direction,
+                        keyword,
+                        stock
+                )
+        );
     }
 
     @GetMapping("/{id}")
-    public ProductResponseDto getById(
-            @PathVariable Long id) {
+    public ApiResponse<ProductResponseDto> getById(
+            @PathVariable Long id){
 
-        return productService.getById(id);
+        return ResponseBuilder.success(
+                "Product fetched successfully",
+                productService.getById(id));
     }
 
     @PutMapping("/{id}")
-    public ProductResponseDto update(
+    public ApiResponse<ProductResponseDto> update(
             @PathVariable Long id,
-            @Valid @RequestBody ProductRequestDto request) {
+            @Valid @RequestBody ProductRequestDto request){
 
-        return productService.update(id, request);
+        return ResponseBuilder.success(
+                "Product updated successfully",
+                productService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public String delete(
-            @PathVariable Long id) {
+    public ApiResponse<Void> delete(
+            @PathVariable Long id){
 
         productService.delete(id);
 
-        return "Product Deleted Successfully";
+        return ResponseBuilder.success(
+                "Product deleted successfully",
+                null);
     }
 }

@@ -15,6 +15,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import com.venkatesh.ai_crm_platform.response.PageResponse;
+import com.venkatesh.ai_crm_platform.specification.EmailSpecification;
+
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 
 @Service
 @RequiredArgsConstructor
@@ -42,12 +47,65 @@ public class EmailService {
         return EmailMapper.toResponse(emailRepository.save(email));
     }
 
-    public List<EmailResponseDto> getAll(){
+    public PageResponse<EmailResponseDto> getAll(
 
-        return emailRepository.findAll()
-                .stream()
-                .map(EmailMapper::toResponse)
-                .toList();
+            int page,
+
+            int size,
+
+            String sortBy,
+
+            String direction,
+
+            String keyword,
+
+            String status
+
+    ){
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page,size,sort);
+
+        Specification<Email> specification =
+
+                Specification.where(
+                        EmailSpecification.search(keyword)
+                ).and(
+                        EmailSpecification.status(status)
+                );
+
+        Page<Email> emailPage =
+                emailRepository.findAll(specification,pageable);
+
+        List<EmailResponseDto> emailDtos =
+
+                emailPage.getContent()
+
+                        .stream()
+
+                        .map(EmailMapper::toResponse)
+
+                        .toList();
+
+        return new PageResponse<>(
+
+                emailDtos,
+
+                emailPage.getNumber(),
+
+                emailPage.getSize(),
+
+                emailPage.getTotalElements(),
+
+                emailPage.getTotalPages(),
+
+                emailPage.isLast()
+
+        );
+
     }
 
     public EmailResponseDto getById(Long id){

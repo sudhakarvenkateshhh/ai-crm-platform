@@ -3,6 +3,9 @@ package com.venkatesh.ai_crm_platform.Controller;
 import com.venkatesh.ai_crm_platform.Service.CustomerService;
 import com.venkatesh.ai_crm_platform.dto.customer.CustomerRequestDto;
 import com.venkatesh.ai_crm_platform.dto.customer.CustomerResponseDto;
+import com.venkatesh.ai_crm_platform.response.ApiResponse;
+import com.venkatesh.ai_crm_platform.response.PageResponse;
+import com.venkatesh.ai_crm_platform.response.ResponseBuilder;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,45 +19,73 @@ public class CustomerController {
 
     private final CustomerService customerService;
 
-    // CREATE
     @PostMapping
-    public CustomerResponseDto create(
-            @Valid @RequestBody CustomerRequestDto request) {
+    public ApiResponse<CustomerResponseDto> create(
+            @Valid @RequestBody CustomerRequestDto request){
 
-        return customerService.create(request);
+        return ResponseBuilder.success(
+                "Customer created successfully",
+                customerService.create(request));
     }
 
-    // GET ALL
     @GetMapping
-    public List<CustomerResponseDto> getAll() {
+    public ApiResponse<PageResponse<CustomerResponseDto>> getAll(
 
-        return customerService.getAll();
+            @RequestParam(defaultValue = "0") int page,
+
+            @RequestParam(defaultValue = "10") int size,
+
+            @RequestParam(defaultValue = "id") String sortBy,
+
+            @RequestParam(defaultValue = "asc") String direction,
+
+            @RequestParam(required = false) String keyword,
+
+            @RequestParam(required = false) String company
+    ) {
+
+        return ResponseBuilder.success(
+
+                "Customers fetched successfully",
+
+                customerService.getAll(
+                        page,
+                        size,
+                        sortBy,
+                        direction,
+                        keyword,
+                        company
+                )
+        );
     }
 
-    // GET BY ID
     @GetMapping("/{id}")
-    public CustomerResponseDto getById(
-            @PathVariable Long id) {
+    public ApiResponse<CustomerResponseDto> getById(
+            @PathVariable Long id){
 
-        return customerService.getById(id);
+        return ResponseBuilder.success(
+                "Customer fetched successfully",
+                customerService.getById(id));
     }
 
-    // UPDATE
     @PutMapping("/{id}")
-    public CustomerResponseDto update(
+    public ApiResponse<CustomerResponseDto> update(
             @PathVariable Long id,
-            @Valid @RequestBody CustomerRequestDto request) {
+            @Valid @RequestBody CustomerRequestDto request){
 
-        return customerService.update(id, request);
+        return ResponseBuilder.success(
+                "Customer updated successfully",
+                customerService.update(id, request));
     }
 
-    // DELETE
     @DeleteMapping("/{id}")
-    public String delete(
-            @PathVariable Long id) {
+    public ApiResponse<Void> delete(
+            @PathVariable Long id){
 
         customerService.delete(id);
 
-        return "Customer Deleted Successfully";
+        return ResponseBuilder.success(
+                "Customer deleted successfully",
+                null);
     }
 }

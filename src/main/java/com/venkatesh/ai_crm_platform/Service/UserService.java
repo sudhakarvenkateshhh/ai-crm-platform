@@ -13,6 +13,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import com.venkatesh.ai_crm_platform.response.PageResponse;
+import com.venkatesh.ai_crm_platform.specification.UserSpecification;
+
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +28,7 @@ public class UserService {
 
     // ================= REGISTER =================
 
-    public User register(RegisterRequestDto request) {
+    public UserResponseDto register(RegisterRequestDto request){
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("Email already exists");
@@ -41,7 +46,8 @@ public class UserService {
 
         user.setActive(true);
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        return UserMapper.toResponse(savedUser);
     }
 
     // ================= CREATE USER =================
@@ -59,15 +65,74 @@ public class UserService {
     }
 
     // ================= GET ALL USERS =================
+    public PageResponse<UserResponseDto> getAll(
 
-    public List<UserResponseDto> getAll() {
+            int page,
 
-        return userRepository.findAll()
-                .stream()
-                .map(UserMapper::toResponse)
-                .toList();
+            int size,
+
+            String sortBy,
+
+            String direction,
+
+            String keyword,
+
+            Role role,
+
+            Boolean active
+
+    ){
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+
+                ? Sort.by(sortBy).descending()
+
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page,size,sort);
+
+        Specification<User> specification =
+
+                Specification.where(
+                                UserSpecification.search(keyword)
+                        )
+                        .and(
+                                UserSpecification.role(role)
+                        )
+                        .and(
+                                UserSpecification.active(active)
+                        );
+
+        Page<User> userPage =
+                userRepository.findAll(specification,pageable);
+
+        List<UserResponseDto> userDtos =
+
+                userPage.getContent()
+
+                        .stream()
+
+                        .map(UserMapper::toResponse)
+
+                        .toList();
+
+        return new PageResponse<>(
+
+                userDtos,
+
+                userPage.getNumber(),
+
+                userPage.getSize(),
+
+                userPage.getTotalElements(),
+
+                userPage.getTotalPages(),
+
+                userPage.isLast()
+
+        );
+
     }
-
     // ================= GET USER =================
 
     public UserResponseDto getById(Long id) {

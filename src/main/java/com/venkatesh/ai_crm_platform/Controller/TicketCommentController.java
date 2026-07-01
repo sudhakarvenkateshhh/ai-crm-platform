@@ -3,11 +3,14 @@ package com.venkatesh.ai_crm_platform.Controller;
 import com.venkatesh.ai_crm_platform.Service.TicketCommentService;
 import com.venkatesh.ai_crm_platform.dto.ticketcomment.TicketCommentRequestDto;
 import com.venkatesh.ai_crm_platform.dto.ticketcomment.TicketCommentResponseDto;
+import com.venkatesh.ai_crm_platform.response.ApiResponse;
+import com.venkatesh.ai_crm_platform.response.ResponseBuilder;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import com.venkatesh.ai_crm_platform.response.PageResponse;
 
 @RestController
 @RequestMapping("/api/comments")
@@ -17,31 +20,72 @@ public class TicketCommentController {
     private final TicketCommentService ticketCommentService;
 
     @PostMapping
-    public TicketCommentResponseDto create(
+    public ApiResponse<TicketCommentResponseDto> create(
             @Valid @RequestBody TicketCommentRequestDto request){
 
-        return ticketCommentService.create(request);
+        return ResponseBuilder.success(
+                "Comment created successfully",
+                ticketCommentService.create(request));
     }
 
     @GetMapping
-    public List<TicketCommentResponseDto> getAll(){
+    public ApiResponse<PageResponse<TicketCommentResponseDto>> getAll(
 
-        return ticketCommentService.getAll();
+            @RequestParam(defaultValue="0")
+            int page,
+
+            @RequestParam(defaultValue="10")
+            int size,
+
+            @RequestParam(defaultValue="id")
+            String sortBy,
+
+            @RequestParam(defaultValue="asc")
+            String direction,
+
+            @RequestParam(required=false)
+            String keyword
+    ){
+
+        return ResponseBuilder.success(
+
+                "Comments fetched successfully",
+
+                ticketCommentService.getAll(
+
+                        page,
+
+                        size,
+
+                        sortBy,
+
+                        direction,
+
+                        keyword
+
+                )
+
+        );
+
     }
 
     @GetMapping("/{id}")
-    public TicketCommentResponseDto getById(
+    public ApiResponse<TicketCommentResponseDto> getById(
             @PathVariable Long id){
 
-        return ticketCommentService.getById(id);
+        return ResponseBuilder.success(
+                "Comment fetched successfully",
+                ticketCommentService.getById(id));
     }
 
     @DeleteMapping("/{id}")
-    public String delete(
+    public ApiResponse<Void> delete(
             @PathVariable Long id){
 
         ticketCommentService.delete(id);
 
-        return "Comment Deleted Successfully";
+        return ResponseBuilder.success(
+                "Comment deleted successfully",
+                null);
     }
 }

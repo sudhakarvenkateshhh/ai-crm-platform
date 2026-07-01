@@ -1,21 +1,20 @@
 package com.venkatesh.ai_crm_platform.dto.order;
 
+import com.venkatesh.ai_crm_platform.dto.orderitem.OrderItemRequestDto;
 import com.venkatesh.ai_crm_platform.models.Enum.OrderStatus;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class OrderRequestDto {
 
-    @NotNull
-    private Double totalAmount;
-
-    @NotNull
-    private OrderStatus status;
-
-    @NotNull
     private Long customerId;
 
-    @NotNull
-    private Long productId;
+    private OrderStatus status;
+
+    @NotEmpty(message = "Order must contain at least one item")
+    private List<OrderItemRequestDto> items;
+
 }

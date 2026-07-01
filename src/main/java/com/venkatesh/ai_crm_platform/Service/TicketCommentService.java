@@ -10,6 +10,11 @@ import com.venkatesh.ai_crm_platform.mapper.TicketCommentMapper;
 import com.venkatesh.ai_crm_platform.models.Entities.Ticket;
 import com.venkatesh.ai_crm_platform.models.Entities.TicketComment;
 import com.venkatesh.ai_crm_platform.models.Entities.User;
+import com.venkatesh.ai_crm_platform.response.PageResponse;
+import com.venkatesh.ai_crm_platform.specification.TicketCommentSpecification;
+
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -46,12 +51,64 @@ public class TicketCommentService {
                 ticketCommentRepository.save(comment));
     }
 
-    public List<TicketCommentResponseDto> getAll(){
+    public PageResponse<TicketCommentResponseDto> getAll(
 
-        return ticketCommentRepository.findAll()
-                .stream()
-                .map(TicketCommentMapper::toResponse)
-                .toList();
+            int page,
+
+            int size,
+
+            String sortBy,
+
+            String direction,
+
+            String keyword
+
+    ){
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+
+                ? Sort.by(sortBy).descending()
+
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page,size,sort);
+
+        Specification<TicketComment> specification =
+
+                Specification.where(
+                        TicketCommentSpecification.search(keyword)
+                );
+
+        Page<TicketComment> commentPage =
+
+                ticketCommentRepository.findAll(specification,pageable);
+
+        List<TicketCommentResponseDto> commentDtos =
+
+                commentPage.getContent()
+
+                        .stream()
+
+                        .map(TicketCommentMapper::toResponse)
+
+                        .toList();
+
+        return new PageResponse<>(
+
+                commentDtos,
+
+                commentPage.getNumber(),
+
+                commentPage.getSize(),
+
+                commentPage.getTotalElements(),
+
+                commentPage.getTotalPages(),
+
+                commentPage.isLast()
+
+        );
+
     }
 
     public TicketCommentResponseDto getById(Long id){

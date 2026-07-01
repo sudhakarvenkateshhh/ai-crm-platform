@@ -10,7 +10,16 @@ import com.venkatesh.ai_crm_platform.mapper.TicketMapper;
 import com.venkatesh.ai_crm_platform.models.Entities.Customer;
 import com.venkatesh.ai_crm_platform.models.Entities.Ticket;
 import com.venkatesh.ai_crm_platform.models.Entities.User;
+import com.venkatesh.ai_crm_platform.models.Enum.Priority;
+import com.venkatesh.ai_crm_platform.models.Enum.TicketStatus;
+import com.venkatesh.ai_crm_platform.response.PageResponse;
+import com.venkatesh.ai_crm_platform.specification.TicketSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -42,12 +51,73 @@ public class TicketService {
         return TicketMapper.toResponse(ticketRepository.save(ticket));
     }
 
-    public List<TicketResponseDto> getAll(){
+    public PageResponse<TicketResponseDto> getAll(
 
-        return ticketRepository.findAll()
-                .stream()
-                .map(TicketMapper::toResponse)
-                .toList();
+            int page,
+
+            int size,
+
+            String sortBy,
+
+            String direction,
+
+            String keyword,
+
+            TicketStatus status,
+
+            Priority priority
+
+    ){
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+
+                ? Sort.by(sortBy).descending()
+
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page,size,sort);
+
+        Specification<Ticket> specification =
+
+                Specification.where(
+                                TicketSpecification.search(keyword)
+                        )
+                        .and(
+                                TicketSpecification.status(status)
+                        )
+                        .and(
+                                TicketSpecification.priority(priority)
+                        );
+
+        Page<Ticket> ticketPage =
+                ticketRepository.findAll(specification,pageable);
+
+        List<TicketResponseDto> ticketDtos =
+
+                ticketPage.getContent()
+
+                        .stream()
+
+                        .map(TicketMapper::toResponse)
+
+                        .toList();
+
+        return new PageResponse<>(
+
+                ticketDtos,
+
+                ticketPage.getNumber(),
+
+                ticketPage.getSize(),
+
+                ticketPage.getTotalElements(),
+
+                ticketPage.getTotalPages(),
+
+                ticketPage.isLast()
+
+        );
+
     }
 
     public TicketResponseDto getById(Long id){

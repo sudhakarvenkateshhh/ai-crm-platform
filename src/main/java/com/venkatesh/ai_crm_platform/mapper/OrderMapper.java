@@ -6,14 +6,12 @@ import com.venkatesh.ai_crm_platform.models.Entities.Order;
 
 public class OrderMapper {
 
-    private OrderMapper() {
-    }
+    private OrderMapper(){}
 
     public static Order toEntity(OrderRequestDto dto){
 
         Order order = new Order();
 
-        order.setTotalAmount(dto.getTotalAmount());
         order.setStatus(dto.getStatus());
 
         return order;
@@ -24,20 +22,35 @@ public class OrderMapper {
         OrderResponseDto dto = new OrderResponseDto();
 
         dto.setId(order.getId());
+
         dto.setOrderDate(order.getOrderDate());
+
         dto.setTotalAmount(order.getTotalAmount());
+
         dto.setStatus(order.getStatus());
 
         if(order.getCustomer()!=null){
+
             dto.setCustomerId(order.getCustomer().getId());
+
             dto.setCustomerName(order.getCustomer().getName());
+
         }
 
-        if(order.getProduct()!=null){
-            dto.setProductId(order.getProduct().getId());
-            dto.setProductName(order.getProduct().getName());
-        }
+        dto.setItems(
+
+                order.getItems()
+
+                        .stream()
+
+                        .map(OrderItemMapper::toResponse)
+
+                        .toList()
+
+        );
 
         return dto;
+
     }
+
 }

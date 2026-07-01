@@ -12,6 +12,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import com.venkatesh.ai_crm_platform.response.PageResponse;
+import com.venkatesh.ai_crm_platform.specification.CampaignSpecification;
+
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 
 @Service
 @RequiredArgsConstructor
@@ -34,12 +39,65 @@ public class CampaignService {
                 campaignRepository.save(campaign));
     }
 
-    public List<CampaignResponseDto> getAll(){
+    public PageResponse<CampaignResponseDto> getAll(
 
-        return campaignRepository.findAll()
-                .stream()
-                .map(CampaignMapper::toResponse)
-                .toList();
+            int page,
+
+            int size,
+
+            String sortBy,
+
+            String direction,
+
+            String keyword,
+
+            Long createdById
+
+    ){
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Specification<Campaign> specification =
+
+                Specification.where(
+                        CampaignSpecification.search(keyword)
+                ).and(
+                        CampaignSpecification.createdBy(createdById)
+                );
+
+        Page<Campaign> campaignPage =
+                campaignRepository.findAll(specification, pageable);
+
+        List<CampaignResponseDto> campaignDtos =
+
+                campaignPage.getContent()
+
+                        .stream()
+
+                        .map(CampaignMapper::toResponse)
+
+                        .toList();
+
+        return new PageResponse<>(
+
+                campaignDtos,
+
+                campaignPage.getNumber(),
+
+                campaignPage.getSize(),
+
+                campaignPage.getTotalElements(),
+
+                campaignPage.getTotalPages(),
+
+                campaignPage.isLast()
+
+        );
+
     }
 
     public CampaignResponseDto getById(Long id){

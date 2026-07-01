@@ -8,7 +8,14 @@ import com.venkatesh.ai_crm_platform.exception.ResourceNotFoundException;
 import com.venkatesh.ai_crm_platform.mapper.CustomerMapper;
 import com.venkatesh.ai_crm_platform.models.Entities.Customer;
 import com.venkatesh.ai_crm_platform.models.Entities.User;
+import com.venkatesh.ai_crm_platform.response.PageResponse;
+import com.venkatesh.ai_crm_platform.specification.CustomerSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -44,7 +51,43 @@ public class CustomerService {
     }
 
     // GET ALL
-    public List<CustomerResponseDto> getAll() {
+    public PageResponse<CustomerResponseDto> getAll(
+            int page,
+            int size,
+            String sortBy,
+            String direction,
+            String keyword,
+            String company
+    ) {
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Specification<Customer> specification =
+                Specification.where(CustomerSpecification.search(keyword))
+                        .and(CustomerSpecification.company(company));
+
+        Page<Customer> customerPage =
+                customerRepository.findAll(specification, pageable);
+
+        List<CustomerResponseDto> customerDtos =
+                customerPage.getContent()
+                        .stream()
+                        .map(CustomerMapper::toResponse)
+                        .toList();
+
+        return new PageResponse<>(
+                customerDtos,
+                customerPage.getNumber(),
+                customerPage.getSize(),
+                customerPage.getTotalElements(),
+                customerPage.getTotalPages(),
+                customerPage.isLast()
+        );
+    }  public List<CustomerResponseDto> getAll() {
 
         return customerRepository.findAll()
                 .stream()

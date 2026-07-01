@@ -3,7 +3,10 @@ package com.venkatesh.ai_crm_platform.Controller;
 import com.venkatesh.ai_crm_platform.dto.auth.LoginRequestDto;
 import com.venkatesh.ai_crm_platform.dto.auth.LoginResponseDto;
 import com.venkatesh.ai_crm_platform.dto.auth.RegisterRequestDto;
+import com.venkatesh.ai_crm_platform.dto.user.UserResponseDto;
 import com.venkatesh.ai_crm_platform.models.Entities.User;
+import com.venkatesh.ai_crm_platform.response.ApiResponse;
+import com.venkatesh.ai_crm_platform.response.ResponseBuilder;
 import com.venkatesh.ai_crm_platform.security.JwtService;
 import com.venkatesh.ai_crm_platform.Service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -23,13 +26,17 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public User register(@RequestBody RegisterRequestDto request) {
+    public ApiResponse<UserResponseDto> register(
+            @RequestBody RegisterRequestDto request){
 
-        return userService.register(request);
+        return ResponseBuilder.success(
+                "User registered successfully",
+                userService.register(request));
     }
+
     @PostMapping("/login")
-    public LoginResponseDto login(
-            @RequestBody LoginRequestDto request) {
+    public ApiResponse<LoginResponseDto> login(
+            @RequestBody LoginRequestDto request){
 
         Authentication authentication =
                 authenticationManager.authenticate(
@@ -45,6 +52,8 @@ public class AuthController {
         String token =
                 jwtService.generateToken(userDetails);
 
-        return new LoginResponseDto(token);
+        return ResponseBuilder.success(
+                "Login successful",
+                new LoginResponseDto(token));
     }
 }

@@ -1,9 +1,11 @@
 package com.venkatesh.ai_crm_platform.dto.order;
 
+import com.venkatesh.ai_crm_platform.dto.orderitem.OrderItemResponseDto;
 import com.venkatesh.ai_crm_platform.models.Enum.OrderStatus;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class OrderResponseDto {
@@ -20,7 +22,6 @@ public class OrderResponseDto {
 
     private String customerName;
 
-    private Long productId;
+    private List<OrderItemResponseDto> items;
 
-    private String productName;
 }

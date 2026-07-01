@@ -13,6 +13,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import com.venkatesh.ai_crm_platform.response.PageResponse;
+import com.venkatesh.ai_crm_platform.specification.NotificationSpecification;
+
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 
 @Service
 @RequiredArgsConstructor
@@ -38,12 +43,65 @@ public class NotificationService {
                 notificationRepository.save(notification));
     }
 
-    public List<NotificationResponseDto> getAll(){
+    public PageResponse<NotificationResponseDto> getAll(
 
-        return notificationRepository.findAll()
-                .stream()
-                .map(NotificationMapper::toResponse)
-                .toList();
+            int page,
+
+            int size,
+
+            String sortBy,
+
+            String direction,
+
+            String keyword,
+
+            Boolean isRead
+
+    ){
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Specification<Notifications> specification =
+
+                Specification.where(
+                        NotificationSpecification.search(keyword)
+                ).and(
+                        NotificationSpecification.isRead(isRead)
+                );
+
+        Page<Notifications> notificationPage =
+                notificationRepository.findAll(specification, pageable);
+
+        List<NotificationResponseDto> notificationDtos =
+
+                notificationPage.getContent()
+
+                        .stream()
+
+                        .map(NotificationMapper::toResponse)
+
+                        .toList();
+
+        return new PageResponse<>(
+
+                notificationDtos,
+
+                notificationPage.getNumber(),
+
+                notificationPage.getSize(),
+
+                notificationPage.getTotalElements(),
+
+                notificationPage.getTotalPages(),
+
+                notificationPage.isLast()
+
+        );
+
     }
 
     public NotificationResponseDto getById(Long id){
